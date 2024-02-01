@@ -57,7 +57,7 @@ def submit_documents():
     for doc in document_names:
         submit_document(doc)
 
-    return "Documents submitted successfully!"
+    return "Documents submitted!"
 
 @app.route('/login')
 def login():
