@@ -18,8 +18,8 @@ input_names = {
 }
 
 # Function to fill and submit the form for a single document
-def submit_document(doc):
-    return jsonify({'message': 'Document submitted!', 'status': 'success'})
+# def submit_document(doc):
+#     return jsonify({'message': 'Document submitted!', 'status': 'success'})
     # Form data for the document
     # form_data = {
     #     # 'dc_title': 'Sample Title',
@@ -83,9 +83,6 @@ def submit_documents():
         file.save(f'uploads/{file.filename}')
 
     return 'Files submitted successfully'
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 @app.route('/login')
