@@ -18,60 +18,55 @@ input_names = {
 }
 
 # Function to fill and submit the form for a single document
-# def submit_document(doc):
-#     return jsonify({'message': 'Document submitted!', 'status': 'success'})
+def submit_document(doc):
+    return jsonify({'message': 'Document submitted!', 'status': 'success'})
     # Form data for the document
-    # form_data = {
-    #     # 'dc_title': 'Sample Title',
-    #     'dv_contributor_author_last': 'Machakos University',
-    #     'dc_date_issued_year': '2022',
-    #     'dc_date_issued_month': 'December',  # Assuming the date format is YYYY-MM
-    #     'dv_publisher': 'Machakos University Press',
-    #     'dc_type': 'Learning Object',
-    #     'decision': 'on',
-    # }
+    form_data = {
+        # 'dc_title': 'Sample Title',
+        'dv_contributor_author_last': 'Machakos University',
+        'dc_date_issued_year': '2022',
+        'dc_date_issued_month': 'December',  # Assuming the date format is YYYY-MM
+        'dv_publisher': 'Machakos University Press',
+        'dc_type': 'Learning Object',
+        'decision': 'on',
+    }
 
-    # form_data['additional_field'] = 'additional_value'
+    form_data['additional_field'] = 'additional_value'
     # get title of the doc from the uploaded file
-    # form_data['dc_title'] = doc.split('.')[0]
+    form_data['dc_title'] = doc.split('.')[0]
 
     # Submit the form
-    # response = requests.post(base_url + 'submit_form', data=form_data)
+    response = requests.post(base_url + 'submit_form', data=form_data)
 
     # Check if the submission was successful
-    # if response.status_code == 200:
-    #     print(f"Document '{doc}' submitted successfully!")
-    # else:
-    #     print(f"Failed to submit document '{doc}'. Status code: {response.status_code}")
+    if response.status_code == 200:
+        print(f"Document '{doc}' submitted successfully!")
+    else:
+        print(f"Failed to submit document '{doc}'. Status code: {response.status_code}")
 
 # Route for testing
 @app.route('/test')
-def index():
+def test():
     return "Urls should be working!"
 
-@app.route('/test-uploads', methods=['GET'])
+@app.route('/test-uploads')
 def test_uploads():
     return render_template('home/index.html')
 
 # Route to trigger document submission
 # @app.route('/submit_documents', methods=['POST'])
-# def submit_documents():
+def submit_documents():
     # Assuming you have a list of document names
-    # document_names = request.form.getlist('documents')
+    document_names = request.form.getlist('documents')
 
-    # for doc in document_names:
-    #     submit_document(doc)
+    for doc in document_names:
+        submit_document(doc)
 
-    # return "Documents submitted!"
-
-
-from flask import Flask, request, render_template
-
-app = Flask(__name__)
+    return "Documents submitted!"
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('test/index.html')
 
 @app.route('/submit_documents', methods=['POST'])
 def submit_documents():
