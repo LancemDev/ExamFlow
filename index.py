@@ -1,4 +1,6 @@
 import requests
+import os
+import dotenv
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -22,7 +24,6 @@ def submit_document(doc):
     return jsonify({'message': 'Document submitted!', 'status': 'success'})
     # Form data for the document
     form_data = {
-        # 'dc_title': 'Sample Title',
         'dv_contributor_author_last': 'Machakos University',
         'dc_date_issued_year': '2022',
         'dc_date_issued_month': 'December',  # Assuming the date format is YYYY-MM
@@ -44,6 +45,8 @@ def submit_document(doc):
     else:
         print(f"Failed to submit document '{doc}'. Status code: {response.status_code}")
 
+    return response
+
 # Route for testing
 @app.route('/test')
 def test():
@@ -55,18 +58,31 @@ def test_uploads():
 
 # Route to trigger document submission
 # @app.route('/submit_documents', methods=['POST'])
-def submit_documents():
-    # Assuming you have a list of document names
-    document_names = request.form.getlist('documents')
+# def submit_documents():
+#     # Assuming you have a list of document names
+#     document_names = request.form.getlist('documents')
 
-    for doc in document_names:
-        submit_document(doc)
+#     for doc in document_names:
+#         submit_document(doc)
 
-    return "Documents submitted!"
+#     return "Documents submitted!"
 
 @app.route('/')
 def index():
     return render_template('test/index.html')
+
+def save_doc(file):
+    upload_path = f'uploads/{file.filename}'
+    
+    if not os.path.exists(upload_path):
+        file.save(upload_path)
+        return "File saved successfully"
+    else:
+        # Handle the case where the file already exists
+        return "File with the same name already exists"
+
+
+    
 
 @app.route('/submit_documents', methods=['POST'])
 def submit_documents():
@@ -74,17 +90,19 @@ def submit_documents():
 
     # Process the uploaded files as needed
     for file in uploaded_files:
-        # Handle each file, for example, save it to a folder
-        file.save(f'uploads/{file.filename}')
+        # Save each file
+        save_doc(file)
+        # then submit the document
+        submit_document(file)
 
-    return 'Files submitted successfully'
+    return 'Files saved successfully'
 
 
 @app.route('/login')
 def login():
     # Manually login to the website
-    email = 'x@gmail.com'
-    password = '12345678'
+    email = dotenv.get('EMAIL')
+    password = dotenv.get('PASSWORD')
 
     login_url = base_url + 'login'
 

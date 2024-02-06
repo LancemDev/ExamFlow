@@ -163,9 +163,9 @@
     const hidden = document.getElementById("hidden-input");
     document.getElementById("button").onclick = () => hidden.click();
     hidden.onchange = (e) => {
-    for (const file of e.target.files) {
-    addFile(gallery, file);
-    }
+        for (const file of e.target.files) {
+            addFile(gallery, file);
+        }
     };
 
     // use to check if a file is being dragged
@@ -179,55 +179,52 @@
 
     // reset counter and append file to gallery when file is dropped
     function dropHandler(ev) {
-    ev.preventDefault();
-    for (const file of ev.dataTransfer.files) {
-    addFile(gallery, file);
-    overlay.classList.remove("draggedover");
-    counter = 0;
-    }
+        ev.preventDefault();
+        for (const file of ev.dataTransfer.files) {
+            addFile(gallery, file);
+            overlay.classList.remove("draggedover");
+            counter = 0;
+        }
     }
 
     // only react to actual files being dragged
     function dragEnterHandler(e) {
-    e.preventDefault();
-    if (!hasFiles(e)) {
-    return;
-    }
-    ++counter && overlay.classList.add("draggedover");
+        e.preventDefault();
+        if (!hasFiles(e)) {
+            return;
+        }
+        ++counter && overlay.classList.add("draggedover");
     }
 
     function dragLeaveHandler(e) {
-    1 > --counter && overlay.classList.remove("draggedover");
+        1 > --counter && overlay.classList.remove("draggedover");
     }
 
     function dragOverHandler(e) {
-    if (hasFiles(e)) {
-    e.preventDefault();
-    }
+        if (hasFiles(e)) {
+            e.preventDefault()  
+        }
     }
 
     // event delegation to caputre delete events
     // fron the waste buckets in the file preview cards
     gallery.onclick = ({ target }) => {
-    if (target.classList.contains("delete")) {
-    const ou = target.dataset.target;
-    document.getElementById(ou).remove(ou);
-    gallery.children.length === 1 && empty.classList.remove("hidden");
-    delete FILES[ou];
-    }
+        if (target.classList.contains("delete")) {
+            const ou = target.dataset.target;
+            document.getElementById(ou).remove(ou);
+            gallery.children.length === 1 && empty.classList.remove("hidden");
+            delete FILES[ou];
+        }
     };
 
     // print all selected files
     document.getElementById("submit").onclick = async () => {
-        alert(`Submitted Files:\n${JSON.stringify(FILES)}`);
-        console.log(FILES);
-
+        alert('Submitted Files:\n${JSON.stringify(FILES)}')
+        // alert(`Submitted Files:\n${JSON.stringify(FILES)}`);
         let formData = new FormData();
-        for(let url in FILES) {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            let filename = url.split('/').pop();
-            formData.append('documents', new File([blob], filename));
+
+        for (const [url, file] of Object.entries(FILES)) {
+            formData.append('documents', file);
         }
 
         fetch('/submit_documents', {
@@ -240,6 +237,7 @@
             console.error('Error:', error);
         });
     };
+
 
     // clear entire selection
     document.getElementById("cancel").onclick = () => {
