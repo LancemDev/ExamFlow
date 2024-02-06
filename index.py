@@ -1,12 +1,12 @@
 import requests
 import os
-import dotenv
+# import dotenv
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
 # Base URL for the website
-base_url = 'https://ir.mksu.ac.ke/'
+base_url = 'https://ir.mksu.ac.ke/handle/123456780/'
 
 # Sample input names for the form fields
 input_names = {
@@ -18,6 +18,33 @@ input_names = {
     'type': 'dc_type',
     'license': 'dv_license',
 }
+
+agriculture = 189
+business = 217
+education = 218
+engineering = 219
+environment = 221
+health_sciences = 220
+hospitality = 216
+humanities = 188
+pure_sciences = 215
+
+
+full_url_example = base_url + str(engineering)
+
+headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': 'JSESSIONID=3A2F3B4E3B0F9A',
+        'Host': 'ir.mksu.ac.ke',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://ir.mksu.ac.ke",
+        "Referer": "https://ir.mksu.ac.ke/handle/123456780/219",
+        "Upgrade-Insecure-Requests": "1",
+
+    }
+
 
 # Function to fill and submit the form for a single document
 def submit_document(doc):
@@ -32,12 +59,12 @@ def submit_document(doc):
         'decision': 'on',
     }
 
-    form_data['additional_field'] = 'additional_value'
+    # form_data['additional_field'] = 'additional_value'
     # get title of the doc from the uploaded file
     form_data['dc_title'] = doc.split('.')[0]
 
     # Submit the form
-    response = requests.post(base_url + 'submit_form', data=form_data)
+    response = session.post(full_url_example + 'submit', data=form_data, headers=headers)
 
     # Check if the submission was successful
     if response.status_code == 200:
@@ -56,17 +83,6 @@ def test():
 def test_uploads():
     return render_template('home/index.html')
 
-# Route to trigger document submission
-# @app.route('/submit_documents', methods=['POST'])
-# def submit_documents():
-#     # Assuming you have a list of document names
-#     document_names = request.form.getlist('documents')
-
-#     for doc in document_names:
-#         submit_document(doc)
-
-#     return "Documents submitted!"
-
 @app.route('/')
 def index():
     return render_template('test/index.html')
@@ -76,7 +92,7 @@ def save_doc(file):
     
     if not os.path.exists(upload_path):
         file.save(upload_path)
-        return "File saved successfully"
+        return file.filename + " saved successfully"
     else:
         # Handle the case where the file already exists
         return "File with the same name already exists"
@@ -97,21 +113,35 @@ def submit_documents():
 
     return 'Files saved successfully'
 
+@app.route('/login', methods=['GET'])
+def login_get():
+    return render_template('home/login.html')
 
-@app.route('/login')
-def login():
-    # Manually login to the website
-    email = dotenv.get('EMAIL')
-    password = dotenv.get('PASSWORD')
+session = requests.Session()
 
-    login_url = base_url + 'login'
+@app.route('/login', methods=['POST'])
+def login_post():
+    # return "Login successful!"
+    email = request.form.get('email')
+    password = request.form.get('password')
 
 
-    # Create a session
-    session = requests.Session()
+    password_input_name = "login_password"
+    email_input_name = "login_email"
 
-    # Send a post request to the login url
-    response = session.post(login_url, data={'email': email, 'password': password})
+    login_url = "ir.mksu.ac.ke/password-login"
+
+    login_data = {
+        email_input_name: email,
+        password_input_name: password
+    }
+
+    response = session.post(login_url, data=login_data, headers=headers)
+    if not response.ok:
+        return "Login failed.....\nEmail: " + email + "\nPassword: " + password
+    # redirect to /test-uploads
+    return "Login successful!.....\nEmail: " + email + "\nPassword: " + password
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
